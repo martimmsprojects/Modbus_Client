@@ -21,25 +21,26 @@ char* modbus_exception_msg(uint8_t ex){
 }
 int Read_h_regs(char* server_add, int port, uint32_t st_r, uint16_t n_r, uint16_t* val){
     if(!server_add){
-        printf("INVALID Server address...\n");
+        //printf("INVALID Server address...\n");
         return -1;
     }
     if(port < 0 || port > 65535){
-        printf("INVALID port...\n");
+        //printf("INVALID port...\n");
+        return -1;
     }
 
-    if(st_r < 0 || st_r > 65536){
-        printf("INVALID Register address number...\n");
+    if(st_r <= 0 || st_r > 65536){
+        //printf("INVALID Register address number...\n");
         return -1;
     }
 
     if((uint32_t)(n_r) + st_r > 65536){
-        printf("INVALID Register address numbers...\n");
+        //printf("INVALID Register address numbers...: Value should be in between 1-65336\n");
         return -1;
     }
 
     if(n_r > 125 || n_r <= 0){
-        printf("INVALID number of reading registers: Value should be in between 1-125");
+        //printf("INVALID number of reading registers: Value should be in between 1-125\n");
         return -1;
     }
     
@@ -56,13 +57,14 @@ int Read_h_regs(char* server_add, int port, uint32_t st_r, uint16_t n_r, uint16_
         return -1;
     }
 
-    printf("DATA RECIVED ...\n");
+    //printf("DATA RECEIVED ...\n");
 
     if(APDU_R[0] & 0x80){
         uint8_t ex = APDU_R[1];
-        printf("Modbus exception (FC=0x%02X): %s\n", APDU[0] & 0x7F, modbus_exception_msg(ex));
-        return -1;
-    }         
+        //printf("Modbus exception (FC=0x%02X): %s\n", APDU[0] & 0x7F, modbus_exception_msg(ex));
+        return -1 * (int)(ex);
+    } 
+      
     for(i=0; i<n_r; i++){
         val[i] = (APDU_R[i*2+2]<<8) | APDU_R[i*2+3];
     }
@@ -71,24 +73,25 @@ int Read_h_regs(char* server_add, int port, uint32_t st_r, uint16_t n_r, uint16_
 }
 int Write_multiple_regs (char* server_add, int port, uint32_t st_r, uint16_t n_r, uint16_t* val){
     if(!server_add){
-        printf("INVALID Server address...\n");
+        //printf("INVALID Server address...\n");
         return -1;
     }
     if(port < 0 || port > 65535){
-        printf("INVALID port...\n");
+        //printf("INVALID port...\n");
+        return -1;
     }
     if(st_r < 0 || st_r > 65536){
-        printf("INVALID Register address number...\n");
+        //printf("INVALID Register address number...\n");
         return -1;
     }
 
     if(n_r + st_r > 65536){
-        printf("INVALID Register address numbers...\n");
+        //printf("INVALID Register address numbers...\n");
         return -1;
     }
 
     if(n_r > 123 || n_r <= 0){
-        printf("INVALID number of writting registers: Value should be in between 1-123");
+        //printf("INVALID number of writting registers: Value should be in between 1-123");
         return -1;
     }
 
@@ -111,12 +114,12 @@ int Write_multiple_regs (char* server_add, int port, uint32_t st_r, uint16_t n_r
         return -1;
     }
 
-    printf("SUCCESSED...\n");
+    //printf("SUCCESSED...\n");
 
     if(APDU_R[0] & 0x80){
         uint8_t ex = APDU_R[1];
-        printf("Modbus exception (FC=0x%02X): %s\n", APDU[0] & 0x7F, modbus_exception_msg(ex));
-        return -1;
+        //printf("Modbus exception (FC=0x%02X): %s\n", APDU[0] & 0x7F, modbus_exception_msg(ex));
+        return -1 * (int)(ex);
     }
 
     return n_r;
